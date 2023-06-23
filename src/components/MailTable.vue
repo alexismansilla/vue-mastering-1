@@ -5,7 +5,7 @@
         v-for="email in sortedEmails"
         :key="email.id"
         :class="['clickable', email.read ? 'read' : '']"
-        @click="email.read = true"
+        @click="readEmail(email)"
       >
         <td>
           <input type="checkbox" />
@@ -20,7 +20,7 @@
           {{ format(new Date(email.sentAt), 'yyyy-MM-dd') }}
         </td>
         <td>
-          <button @click="email.archived = true">Archive</button>
+          <button @click="archivedEmail(email)">Archive</button>
         </td>
       </tr>
     </tbody>
@@ -29,7 +29,6 @@
 
 <script>
 import { format } from 'date-fns';
-import { ref } from 'vue';
 import axios from 'axios';
 
 export default {
@@ -38,14 +37,12 @@ export default {
   // . Si cambiamos el data por setup necesitamos agregar un componente <Suspend> y en el siguente
   // commit quedará demostrado el cambio.
 
-
   async setup() {
-    let emails = await axios.get('http://my-json-server.typicode.com/alexismansilla/vue-mastering-1/emails')
-    console.log(emails)
+    let { data: emails } = await axios.get('http:///localhost:4000/emails')
 
     return {
       format,
-      emails = emails
+      emails
     };
   },
   computed: {
@@ -55,6 +52,19 @@ export default {
         .sort((e1, e2) => e2.sentAt - e1.sentAt);
     },
   },
+  methods: {
+    readEmail(email) {
+      email.read = true;
+      this.updateEmail(email);
+    },
+    archivedEmail(email) {
+      email.archived = true;
+      this.updateEmail(email);
+    },
+    updateEmail(email) {
+      axios.put(`http://localhost:4000/emails/${email.id}`, email)
+    }
+  }
 };
 </script>
 
