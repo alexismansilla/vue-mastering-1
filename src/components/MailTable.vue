@@ -2,7 +2,7 @@
   <table class="mail-table">
     <tbody>
       <tr
-        v-for="email in sortedEmails"
+        v-for="email in unarchivedEmails"
         :key="email.id"
         :class="['clickable', email.read ? 'read' : '']"
         @click="readEmail(email)"
@@ -17,7 +17,7 @@
           </p>
         </td>
         <td class="date">
-          {{ format(new Date(email.sentAt), 'yyyy-MM-dd') }}
+          {{ dateFormat(email) }}
         </td>
         <td>
           <button @click="archivedEmail(email)">Archive</button>
@@ -46,11 +46,14 @@ export default {
     };
   },
   computed: {
-    sortedEmails() {
-      return this.emails
-        .filter((e) => !e.archived)
-        .sort((e1, e2) => e2.sentAt - e1.sentAt);
+    unarchivedEmails() {
+      return this.emails.filter((e) => !e.archived);
     },
+    // sortedEmails() {
+    //   return this.emails
+    //     .filter((e) => !e.archived)
+    //     .sort((e1, e2) => e1.sentAt < e2.sentAt ? 1 : -1);
+    // },
   },
   methods: {
     readEmail(email) {
@@ -63,7 +66,10 @@ export default {
     },
     updateEmail(email) {
       axios.put(`http://localhost:4000/emails/${email.id}`, email)
-    }
+    },
+    dateFormat(email) {
+      return format(new Date(email.sentAt), 'yyyy-MM-dd');
+    },
   }
 };
 </script>
