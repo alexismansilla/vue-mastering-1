@@ -1,30 +1,36 @@
 <template>
-  <table class="mail-table">
-    <tbody>
-      <tr
-        v-for="email in unarchivedEmails"
-        :key="email.id"
-        :class="['clickable', email.read ? 'read' : '']"
-        @click="readEmail(email)"
-      >
-        <td>
-          <input type="checkbox" />
-        </td>
-        <td>{{ email.from }}</td>
-        <td>
-          <p>
-            <strong>{{ email.subject }}</strong> - {{ email.body }}
-          </p>
-        </td>
-        <td class="date">
-          {{ dateFormat(email) }}
-        </td>
-        <td>
-          <button @click="archivedEmail(email)">Archive</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div>
+    <table class="mail-table">
+      <tbody>
+        <tr
+          v-for="email in unarchivedEmails"
+          :key="email.id"
+          :class="['clickable', email.read ? 'read' : '']"
+          @click="openEmail(email)"
+        >
+          <td>
+            <input type="checkbox" />
+          </td>
+          <td>{{ email.from }}</td>
+          <td>
+            <p>
+              <strong>{{ email.subject }}</strong> - {{ email.body }}
+            </p>
+          </td>
+          <td class="date">
+            {{ dateFormat(email) }}
+          </td>
+          <td>
+            <button @click="archivedEmail(email)">Archive</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-if="openedEmail">
+      <h2>{{ openedEmail.subject }}</h2>
+      <p>{{ openedEmail.body }}</p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -42,7 +48,8 @@ export default {
 
     return {
       format,
-      emails
+      emails,
+      openedEmail: null,
     };
   },
   computed: {
@@ -56,9 +63,10 @@ export default {
     // },
   },
   methods: {
-    readEmail(email) {
+    openEmail(email) {
       email.read = true;
       this.updateEmail(email);
+      this.openedEmail = email;
     },
     archivedEmail(email) {
       email.archived = true;
